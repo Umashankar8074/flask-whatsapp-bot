@@ -1,7 +1,6 @@
 from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
 
-# sample code for sending response to our incoming whatsapp message
 
 from flask_cors import CORS
 
