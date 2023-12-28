@@ -22,43 +22,6 @@ def gsheet():
     # connecting to particular worksheet
     worksheet1 = gspreadsheet.worksheet("worksheet1")
 
-    # fetch all worksheets
-    # worksheets = gspreadsheet.worksheets()
-    # print(worksheets)
-
-    # add new worksheet from code
-    # gspreadsheet.add_worksheet("worksheet3", 4, 5)
-
-    # getting url of the gsheet
-    # print(gspreadsheet.url)
-
-    # fetch all values in the worksheets
-    # data = worksheet1.get_all_values()
-    # print(data)
-
-    # data1 = worksheet1.get_all_records()
-    # get_all_records commands prints everything in a worksheet even if the cells are empty
-    # print(data1)
-
-    # To check a particular key/word present in the entire worksheet
-    # cell = worksheet1.find("erg")
-    # print(cell)
-    # print(cell.row, cell.col)
-
-
-    # To fetch a particular value from a particular cell using row and column
-    # cell_value = worksheet1.cell(4, 2).value
-    # # cell_value = worksheet1.cell(4, 2)
-    # print(cell_value)
-
-
-    # To fetch all row values
-    # row3 = worksheet1.row_values(3)
-    # print(row3)
-
-    # # To fetch all column values
-    # col3 = worksheet1.col_values(3)
-    # print(len(col3))
     worksheet1.update_cell(1, 1, 'user phone number')
     worksheet1.update_cell(1, 2, 'list of tasks of user')
     return worksheet1
@@ -80,44 +43,29 @@ def user_check(from_number):
     flag = False
     for i in range(1,n):
         if from_number == col1[i]:
-            idx = i
+            idx = i+1
             flag = True
             break
     if flag == False:
         worksheet1.update_cell(n+1, 1, from_number)
         idx = n+1
-        # here we need to call other function display the menu.
-        # is it required to call this function here below ????
-        # command_list()
     return idx
 
 
 # ----------------------------------------------------------------
 # opeation functionalities
 # Adding a task operation
-def add_task(from_number,task):
+def add_task(task, idx):
     # assuming from_number is at a particular row
-    idx = user_check(from_number)
-    idx = idx + 1
-    print(idx)
+    # print(idx)
     row_idx = worksheet1.row_values(idx)
-    flag = False
-    for i in range(1,len(row_idx)):
-        if row_idx[i] == "":
-            # row_idx[i] = task
-            worksheet1.update_cell(idx, i+1, str(task))
-            flag = True
-            break
-    if flag == False:
-        worksheet1.update_cell(idx, len(row_idx)+1, task)
+    worksheet1.update_cell(idx, len(row_idx)+1, task)
     return "Task added successfully"
 
 # Deleting a task operation
-def delete_task(from_number,task):
+def delete_task(task, idx):
     # assuming from_number is at a particular row
-    idx = user_check(from_number)
-    idx = idx + 1
-    print(idx)
+    # print(idx)
     flag = False
     row_idx = worksheet1.row_values(idx)
     for i in range(1, len(row_idx)):
@@ -126,7 +74,6 @@ def delete_task(from_number,task):
             cell_value = worksheet1.cell(idx, len(row_idx)).value
             worksheet1.update_cell(idx, i+1, cell_value)
             break
-        # row_idx[len(row_idx)-1] = ""
     if flag == False:
         return "Task not found please try again"
     else:
@@ -134,11 +81,9 @@ def delete_task(from_number,task):
         return "Task deleted successfully"
     
 # updating a task operation
-def update_task(from_number, task1, task2):
+def update_task(task1, task2, idx):
     # assuming from_number is at a particular row
-    idx = user_check(from_number)
-    idx = idx + 1
-    print(idx)
+    # print(idx)
     flag = False
     row_idx = worksheet1.row_values(idx)
     for i in range(1, len(row_idx)):
@@ -152,10 +97,8 @@ def update_task(from_number, task1, task2):
         return "Task not updated please try again"
     
 # viewing all tasks for a user
-def view(from_number):
-    idx = user_check(from_number)
-    idx = idx + 1
-    print(idx)
+def view(idx):
+    # print(idx)
     row_idx = worksheet1.row_values(idx)
     print(row_idx)
     if len(row_idx[1:]) == 0:
@@ -167,7 +110,6 @@ def view(from_number):
 # for processing the msg and calling the respective function
 def process_msg(from_number,user_input):
     idx = user_check(from_number)
-    # idx = idx + 1
     # for old user case
     msg = user_input.split()
     print(msg)
@@ -178,13 +120,13 @@ def process_msg(from_number,user_input):
             # task = " ".join(msg[1:])
             if len(task) == 0:
                 return "Error : Invalid input"
-            return add_task(from_number, task)
+            return add_task(task, idx)
         
         elif msg[0] == "Delete":
             # task = " ".join(msg[1:])
             if len(task) == 0:
                 return "Error : Invalid input"
-            return delete_task(from_number, task)
+            return delete_task(task, idx)
         
         elif msg[0] == "Update":
             index = -1
@@ -197,13 +139,12 @@ def process_msg(from_number,user_input):
             print(task1,task2)
             if len(task1) == 0 or len(task2) == 0 or index == -1:
                 return "Error : Invalid input"
-            return update_task(from_number, task1, task2)
+            return update_task(task1, task2, idx)
 
         elif msg[0] == "View":
-            return view(from_number)
+            return view(idx)
         
         else:
-
             return command_list()
     
     elif idx == len(worksheet1.col_values(1)):
